@@ -5,52 +5,75 @@ class Request
 
   def initialize(request_string)
     @request_string = request_string
+
     @method, @resource, @version, @header, @params = request_arr(@request_string) #can i make this better?
      
-    p request_arr(@request_string)
-
   end
 
   private
   def request_arr(string) #make this function more moduable and work if there is more than two headers. Also work let headers have more values (maybe make a two dim array for headers(?) so it kinda works like a table)
-    arr = string.split("\n")
+    input = string.split("\n")
 
-    @me_re_ve_arr = arr[1].split()
+    @arr = input[0].split() 
+
+    @params_arr = []
 
     @header_arr = []
+    
+    
 
-    arr.each do |header|
-      temp
-      if header.include?(":")
-        @header_arr << header.delete(":"),
+    for i in 1..input.length-1 do #input.each do |content|
+
+      content = input[i]
+      
+      if content.include?(":") #else identifiera som param om den har ?, ev gör en identifiera param function
+
+        content = content.split(": ")
+
+        @header_arr << content
+
+      else
 
       end
+
     end
 
-    
-    @params_arr = []
-    #join arr[3] + arr[4] and arr[5] + arr[6], done
 
-    # join_headers(arr, 3, 4)
-    # join_headers(arr, 4, 5)
+    if @arr.include?("?")#lägg detta innan headers eftersom params i resource kommer först
 
-    #add a way to seperate headers from params
+      params = params.split("?")
+      params = params.delete_at(1)
+      params = params.split("&")
 
-    return arr
+      params.each do |param|
+        param = param.split("=")
+        @params_arr << param
+      end
+
+    end
+
+    @arr << @header_arr.to_h
+    @arr << @params_arr.to_h
+
+    # private
+    # def param_strip(param_string)
+
+    p @arr
+    return @arr
   end
-
-  private
-  def join_headers(arr, num1, num2)
-    arr[num1] = [arr[num1], arr[num2]].join(" ")
-    arr.delete_at(num2)
-  end
-
 
 end
 
-request_string = File.read("get-index.request.txt")
+request_string1 = File.read("get-index.request.txt")
+request_string2 = File.read("get-examples.request.txt")
+request_string3 = File.read("get-fruits-with-filter.request.txt")
+request_string4 = File.read("post-login.request.txt")
 
-request = Request.new(request_string)
+request = Request.new(request_string4)
 
 p request.method
+p request.resource
+p request.version
 p request.header
+p request.params
+
