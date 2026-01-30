@@ -14,12 +14,18 @@ class Request
   def request_arr(string) #make this function more moduable and work if there is more than two headers. Also work let headers have more values (maybe make a two dim array for headers(?) so it kinda works like a table)
     input = string.split("\n")
 
-    @arr = input[0].split() 
+
+    @method_resource_version = input[0].split() 
+
+    possible_params = []
+
+    possible_params << @method_resource_version[1]
 
     @params_arr = []
 
     @header_arr = []
-    
+
+    @result = []
     
 
     for i in 1..input.length-1 do #input.each do |content|
@@ -32,34 +38,47 @@ class Request
 
         @header_arr << content
 
+
       else
+        if content.empty? == false
+          possible_params << content
+        end
+
 
       end
 
     end
 
-
-    if @arr.include?("?")#lägg detta innan headers eftersom params i resource kommer först
-
-      params = params.split("?")
-      params = params.delete_at(1)
-      params = params.split("&")
-
-      params.each do |param|
+    p possible_params
+    possible_params.each do |param| #använd .map D:<, GÖR OM ALLT
+      if param.include?("?")
+        _resource, param = param.split("?")
+        params = param.split("&")
+      elsif param.include?("/") == false
+        param = param.split("&")
+      end
+      
+      if param.class == Array
+        param.each do |param|
+          param = param.split("=")
+          @params_arr << param
+        end
+      else
         param = param.split("=")
         @params_arr << param
       end
 
     end
 
-    @arr << @header_arr.to_h
-    @arr << @params_arr.to_h
+
+    @result = @method_resource_version
+    @result << @header_arr.to_h
+    @result << @params_arr.to_h
 
     # private
     # def param_strip(param_string)
 
-    p @arr
-    return @arr
+    return @result
   end
 
 end
