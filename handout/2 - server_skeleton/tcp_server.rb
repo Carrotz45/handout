@@ -1,4 +1,5 @@
 require 'socket'
+require_relative 'lib/request'
 
 class HTTPServer
 
@@ -12,15 +13,28 @@ class HTTPServer
 
     while session = server.accept
       data = ''
+
+      body = ''
+
+      params = ''
+
       while line = session.gets and line !~ /^\s*$/
-        data += line
+        header += line
       end
+      #session läser av varje linje, få tag på de linjerna efter tom rad och lägg in i params
+
+
+      data = body, params #uhh är detta rätt
+
+
       puts "RECEIVED REQUEST"
       puts '-' * 40
       puts data
       puts '-' * 40
 
-      #request = Request.new(data)
+      request = Request.new(data)
+
+      p request
 
       html = "<h1>Hello, World!</h1>"
 

@@ -2,8 +2,7 @@
 class Request
   attr_reader :method, :resource, :version, :header, :params
   def initialize(request_string)
-    @request_string = request_string
-    @method, @resource, @version, @header, @params = request_arr(@request_string) #can i make this better?
+    @method, @resource, @version, @header, @params = request_arr(request_string) #can i make this better?
   end
 
   private
@@ -12,14 +11,14 @@ class Request
     input = string.split("\n")
     method_resource_version = input[0].split() 
     possible_params = []
-    possible_params << method_resource_version[1]
     params_arr = []
     header_arr = []
     result = []
+    possible_params << method_resource_version[1]
 
-    for i in 1..input.length-1 do #ändra till each istället
+    for i in 1..input.length-1 do #kanske ändra till each istället och fixa en body array istället
       content = input[i]
-      if content.include?(":") #else identifiera som param om den har ?, ev gör en identifiera param function
+      if content.include?(":") 
         content = content.split(": ")
         header_arr << content
       else
@@ -29,7 +28,7 @@ class Request
       end
     end
 
-    possible_params.each do |param| #använd .map D:<, GÖR OM ALLT
+    possible_params.each do |param| 
       temp_param = nil
       if param.include?("?") #kollar om det är en param i request
         _resource, temp_param = param.split("?")

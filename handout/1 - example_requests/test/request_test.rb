@@ -7,28 +7,39 @@ class RequestTest < Minitest::Test
     request_string = File.read('get-index.request.txt')
     request = Request.new(request_string)
 
-    assert_equal 'GET', request.method
+    assert_equal "GET", request.method
   end
 
   def test_parses_resource_from_simple_get
     request_string = File.read('get-index.request.txt')
     request = Request.new(request_string)
 
-    assert_equal '/', request.resource
+    assert_equal "/", request.resource
   end
 
-  def test_parses_resource_from_simple_get
+  def test_parses_version_from_simple_get
     request_string = File.read('get-index.request.txt')
     request = Request.new(request_string)
 
-    assert_equal 'HTTP/1.1', request.version
+    assert_equal "HTTP/1.1", request.version
   end
 
-  def test_parses_resource_from_simple_get
+  def test_parses_header_from_simple_get
     request_string = File.read('get-index.request.txt')
     request = Request.new(request_string)
 
-    assert_equal , request.header
+    hash = {"Host"=>"developer.mozilla.org", "Accept-Language"=>"fr"}
+
+    assert_equal hash, request.header
+  end
+
+  def test_parses_params_from_simple_get
+    request_string = File.read('get-index.request.txt')
+    request = Request.new(request_string)
+
+    hash = {}
+
+    assert_equal hash, request.params
   end
 
 end
