@@ -14,17 +14,21 @@ class HTTPServer
     while session = server.accept
       data = ''
 
-      body = ''
-
-      params = ''
-
-      while line = session.gets and line !~ /^\s*$/
-        header += line
+      if Request.new(@header = session.gets).method == "GET"
+        data =+ @header
+        while line = session.gets and line !~ /^\s*$/
+          data += line
+        end
+      else
+        data =+ @header
+        while line = session.gets
+          data += line
+          
+          if Request.new(data).params != {}
+            break
+          end
+        end
       end
-      #session läser av varje linje, få tag på de linjerna efter tom rad och lägg in i params
-
-
-      data = body, params #uhh är detta rätt
 
 
       puts "RECEIVED REQUEST"
@@ -36,7 +40,16 @@ class HTTPServer
 
       p request
 
-      html = "<h1>Hello, World!</h1>"
+      html = nil
+      case request.resource #gör en route fil
+      when "/"
+        html = File.read("html/index.html")
+      when "/pictures"
+        html = File.read("html/pictures.html")
+      else
+        #error page
+      end
+ 
 
       session.print "HTTP/1.1 200\r\n"
       session.print "Content-Type: text/html\r\n"

@@ -53,4 +53,8 @@ class Request
   end
 end
 
+# lala = File.read('..\1 - example_requests\post-login.request.txt')
 
+# request = Request.new(lala)
+
+# p request.params
