@@ -2,11 +2,31 @@
 class Request
   attr_reader :method, :resource, :version, :header, :params
   def initialize(request_string)
-    @method, @resource, @version, @header, @params = request_arr(request_string) #can i make this better?
+    
+    @method, @resource, @version, @header, @params = process_request(request_string)
+
+
+    
   end
 
-  private
-  def request_arr(string) #make this function more moduable and work if there is more than two headers. Also work let headers have more values (maybe make a two dim array for headers(?) so it kinda works like a table)
+  def add_post_params(input)
+    result = []
+    temp_params = input.split("\n")
+    temp_params.each do |line|
+      temp = line.split("&").map{|x| x.split("=")}
+      temp.each do |key_and_value|
+        result << key_and_value
+      end
+    end
+
+    @params = result.to_h
+
+
+
+  end
+
+  private #ta bort processen för att kolla på post params
+  def process_request(string) #make this function more moduable and work if there is more than two headers. Also work let headers have more values (maybe make a two dim array for headers(?) so it kinda works like a table)
     
     input = string.split("\n")
     method_resource_version = input[0].split() 

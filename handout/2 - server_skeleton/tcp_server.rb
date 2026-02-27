@@ -14,45 +14,54 @@ class HTTPServer
     while session = server.accept
       data = ''
 
-      if Request.new(@header = session.gets).method == "GET"
-        data =+ @header
-        while line = session.gets and line !~ /^\s*$/
-          data += line
-        end
-      else
-        data =+ @header
-        while line = session.gets
-          data += line
-          
-          if Request.new(data).params != {}
-            break
-          end
-        end
+      line = session.gets
+      while line && line !~ /^\s*$/
+        data += line
+        line = session.gets  # läs nästa rad
+      end
+
+      request = Request.new(data)
+
+      if request.method == "POST"
+        bytes = request.header["Content-Length"]
+        p bytes
+        params = session.read(bytes.to_i)
+        p params
+        request.add_post_params(params)
       end
 
 
       puts "RECEIVED REQUEST"
       puts '-' * 40
       puts data
+      puts params if params
       puts '-' * 40
 
-      request = Request.new(data)
 
+      
+    
       p request
 
       html = nil
       case request.resource #gör en route fil
       when "/"
-        html = File.read("html/index.html")
+        html = File.binread("html/index.html")
       when "/pictures"
-        html = File.read("html/pictures.html")
+        html = File.binread("html/pictures.html")
+  
+        content_type= "text/html"
       else
-        #error page
+        #kolla i public!
+        Dir.chdir("public")
+        file = request.resource[1..-1]
+        content_type= "image/png"
+        html = File.binread(file)
       end
  
 
       session.print "HTTP/1.1 200\r\n"
-      session.print "Content-Type: text/html\r\n"
+      session.print "Content-Type: #{content_type}\r\n"
+      #lägg till content length
       session.print "\r\n"
       session.print html
       session.close
