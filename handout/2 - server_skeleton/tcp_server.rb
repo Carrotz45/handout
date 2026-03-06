@@ -1,5 +1,6 @@
 require 'socket'
 require_relative 'lib/request'
+require_relative 'lib/response'
 
 class HTTPServer
 
@@ -42,25 +43,32 @@ class HTTPServer
     
       p request
 
-      html = nil
-      case request.resource #gör en route fil
-      when "/"
-        html = File.binread("html/index.html")
-      when "/pictures"
-        html = File.binread("html/pictures.html")
+
+      # html = nil
+      # case request.resource #gör en route fil
+      # when "/"
+      #   html = File.binread("html/index.html")
+      # when "/pictures"
+      #   html = File.binread("html/pictures.html")
+      #   Response.new(request)
   
-        content_type= "text/html"
-      else
-        #kolla i public!
-        Dir.chdir("public")
-        file = request.resource[1..-1]
-        content_type= "image/png"
-        html = File.binread(file)
-      end
- 
+      #   content_type= "text/html"
+      # else
+      #   #kolla i public!
+
+      #   file = request.resource[1..-1]
+      #   content_type= "image/png"
+      #   html = File.binread("public/#{file}")
+
+      #   Response.new(request)
+        
+
+      # end
+
+      html = Response.new(request)
 
       session.print "HTTP/1.1 200\r\n"
-      session.print "Content-Type: #{content_type}\r\n"
+      session.print "Content-Type: #{html.content_type}\r\n"
       #lägg till content length
       session.print "\r\n"
       session.print html
