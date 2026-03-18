@@ -1,7 +1,7 @@
 class Response
   attr_reader :content_type
   def initialize(request)
-    @method, @resource, @version, @header, @params = request.method, request.resource, request.version, request.header, request.params
+    @method, @resource, @params = request.method, request.resource, request.params
     
     @content_type = "text/html"
 
@@ -14,59 +14,66 @@ class Response
 
   end
 
-  image_file_types = ["jpg", "png"]
-  text_file_types = ["html"]
-  audio_file_types = ["mp3", "ogg", "wav"]
+  @image_file_types = ["jpg", "png"]
+  @audio_file_types = ["mp3", "ogg", "wav"]
 
-  file_types = [["image", image_file_types], ["text", text_file_types], ["audio", audio_file_types]].to_h
+  @file_types = {
+    "image" => @image_file_types, 
+    "audio" => @audio_file_types
+  }
 
-  routes = [
-    ["/", "index.html"], 
-    ["/pictures", "pictures.html"]
-  ].to_h 
-
+  
 
   def GET
-    if File.exist?("public/#{@resource}")
+    @routes = [
+      ["/", "index.html"], 
+      ["/pictures", "pictures.html"]
+    ].to_h 
+
+    path = @resource
+
+    
+
+    if path.include?("?")
+      path = path.split("?").pop
+    end
+
+
+    html_file = @routes[path]
+
+
+    if File.exist?("html#{html_file}")
+
+      p "html exists at html#{html_file}"
       
-      p "file exists!"
-      response = File.binread("public/#{@resource}")
-
-      file_type = nil
-
-      image_file_types.each do |type| #gör detta så att det fungerar med alla typer av format
-        if @resource.include?(type)
-          file_type = type
-        end
-
-
-
-      end
-
-
-      @content_type = "text/#{file_type}"
-      
-      return response
-
-    else 
-
-      if File.exist?()
-      
-      elsif @resource.include?("?")
-        path = @resource.split("?").pop
-
-        html_file = routes[path]
-      end
-
-
       response = File.binread("html/#{html_file}")
 
+      @content_type = "text/html"
+
       return response
 
+    elsif File.exist?("public#{path}")
+
+      p "file exists at public#{path}"
+
+      response = File.binread("public#{path}")
+
+      file_type = path.split(".").delete_at(0) #fixa så att om filen har flera punkter funkar detta ändå
+
+      @file_types.each do |key, value|
+ 
+        if value.include?(file_type)
+          @content_type = "#{key}/#{value}"
+        end
+
+      end
+      
+      return response
 
     else
-      p "error 404"
+      #404
     end
+
 
   end
 
@@ -75,12 +82,6 @@ class Response
   def POST
   end
 
-
-
-  def html_reader(route)
-    html = File.read("html/#{route}")
-    return html
-  end
 
   def make_new_route
   end

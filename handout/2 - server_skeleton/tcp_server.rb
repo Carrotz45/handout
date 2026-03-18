@@ -38,10 +38,13 @@ class HTTPServer
       puts params if params
       puts '-' * 40
 
-
       
-    
-      p request
+      
+
+
+
+      p matched_route
+
 
 
       # html = nil
@@ -65,10 +68,15 @@ class HTTPServer
 
       # end
 
-      html = Response.new(request)
+      #
+
+
+      #html = Response.new(request)
 
       session.print "HTTP/1.1 200\r\n"
+      p html.content_type
       session.print "Content-Type: #{html.content_type}\r\n"
+      p html
       #lägg till content length
       session.print "\r\n"
       session.print html
