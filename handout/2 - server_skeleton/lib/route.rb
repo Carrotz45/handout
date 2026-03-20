@@ -4,10 +4,20 @@ class Route
 
     @method, @resource = request.method, request.resource
 
-    @routes = {} #method get
+    @routes = {"/" => "index.html", "/pictures" => "pictures.html"} #method get
+
+    @image_file_types = ["jpg", "png"]
+    @audio_file_types = ["mp3", "ogg", "wav"]
+
+    @file_types = {
+      "image" => @image_file_types, 
+      "audio" => @audio_file_types
+    }
+
+    @matched_route = matched_route
 
 
-    if @method = "GET"
+    if @method == "GET"
 
       path = @resource
 
@@ -15,11 +25,51 @@ class Route
         path = path.split("?").pop
       end
 
+      @matched_route = check_matching_route(path)
+
       
 
     end
 
 
+  end
+
+  def check_matching_route(resource)
+
+    #kolla om det finns i html
+    @routes.each do |key, value|
+      if key == resource
+        @content_type = "text/html"
+        p "html fil finns hos html/#{value}"
+        return value
+      end
+    end
+
+    #kolla i public för en fil som matchar resource
+    if File.exist?("public#{resource}")
+
+      #kolla i file types each value sedan kolla om fil typen efter punkt är med i arrayen
+
+      path_file_type = (resource.split("."))[-1] #splitta vid . och behåll bara det sista värdet
+
+      @file_types.each do |format, file_type|
+        if file_type.include?(path_file_type)
+          result = resource[1..-1]
+          @content_type = "#{format}/#{path_file_type}"
+          p "fil finns hos public/#{result}"
+          return result
+        end
+      end
+
+      
+
+      
+    else
+      p "404"
+    end
+
+    #ta bort kolla efter andra filer förutom html och att den kan sätta content type, flytta det till respons och kör om det inte hittas en html fil(if matched route true)
+    #börja med make new routes, post och dynamic routes som /pictures/:id
 
   end
 

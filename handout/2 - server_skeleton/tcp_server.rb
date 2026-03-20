@@ -1,6 +1,7 @@
 require 'socket'
 require_relative 'lib/request'
 require_relative 'lib/response'
+require_relative 'lib/route'
 
 class HTTPServer
 
@@ -31,6 +32,8 @@ class HTTPServer
         request.add_post_params(params)
       end
 
+      p request
+
 
       puts "RECEIVED REQUEST"
       puts '-' * 40
@@ -42,42 +45,52 @@ class HTTPServer
       
 
 
+      #p matched_route
 
-      p matched_route
+      #response som inte kan ta emot post eller params:
+
+      route_test = Route.new(request)
 
 
+      html = nil
+      content_type = route_test.content_type
+      matched_route = route_test.matched_route
 
-      # html = nil
-      # case request.resource #gör en route fil
-      # when "/"
-      #   html = File.binread("html/index.html")
-      # when "/pictures"
-      #   html = File.binread("html/pictures.html")
-      #   Response.new(request)
-  
-      #   content_type= "text/html"
-      # else
-      #   #kolla i public!
+      
 
-      #   file = request.resource[1..-1]
-      #   content_type= "image/png"
-      #   html = File.binread("public/#{file}")
+      case request.resource #gör en route fil
+      when "/"
+        html = File.binread("html/#{matched_route}")
 
-      #   Response.new(request)
-        
+      when "/pictures"
 
-      # end
+        html = File.binread("html/#{matched_route}")  
+      else
+        #kolla i public!
+
+    
+        html = File.binread("public/#{matched_route}")
+
+      end
 
       #
 
 
       #html = Response.new(request)
 
+      # session.print "HTTP/1.1 200\r\n"
+      # p html.content_type
+      # session.print "Content-Type: #{html.content_type}\r\n"
+      # p html
+      # #lägg till content length
+      # session.print "\r\n"
+      # session.print html
+      # session.close
+
+
       session.print "HTTP/1.1 200\r\n"
-      p html.content_type
-      session.print "Content-Type: #{html.content_type}\r\n"
-      p html
-      #lägg till content length
+      session.print "Content-Type: #{content_type}\r\n"
+      p content_type
       session.print "\r\n"
       session.print html
       session.close
