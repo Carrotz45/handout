@@ -53,26 +53,12 @@ class HTTPServer
 
 
       html = nil
+      
       content_type = route_test.content_type
       matched_route = route_test.matched_route
 
-      
-
-      case request.resource #gör en route fil
-      when "/"
-        html = File.binread("html/#{matched_route}")
-
-      when "/pictures"
-
-        html = File.binread("html/#{matched_route}")  
-      else
-        #kolla i public!
-
-    
-        html = File.binread("public/#{matched_route}")
-
-      end
-
+  
+      html = File.binread(matched_route)
       #
 
 

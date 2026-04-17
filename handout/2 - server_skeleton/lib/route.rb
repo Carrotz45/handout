@@ -27,9 +27,10 @@ class Route
 
       @matched_route = check_matching_route(path)
 
-      
+    else
 
     end
+
 
 
   end
@@ -41,7 +42,7 @@ class Route
       if key == resource
         @content_type = "text/html"
         p "html fil finns hos html/#{value}"
-        return value
+        return "html/#{value}"
       end
     end
 
@@ -57,7 +58,7 @@ class Route
           result = resource[1..-1]
           @content_type = "#{format}/#{path_file_type}"
           p "fil finns hos public/#{result}"
-          return result
+          return "public/#{result}"
         end
       end
 
@@ -66,6 +67,7 @@ class Route
       
     else
       p "404"
+      return "html/404.html"
     end
 
     #ta bort kolla efter andra filer förutom html och att den kan sätta content type, flytta det till respons och kör om det inte hittas en html fil(if matched route true)
@@ -73,12 +75,19 @@ class Route
 
   end
 
-  def get(path)
+  def get(resource, &block)
+    path = resource.split("/")
+    path.each do |segment|
+
+
   end
 
   def post(path)
   end
 
+  router.get("/hello/test") |id|
+    return "hello"
+  end
   def make_new_route(key, value)
 
   end
