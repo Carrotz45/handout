@@ -78,6 +78,15 @@ class Route
   def get(resource, &block)
     path = resource.split("/")
     path.each do |segment|
+      
+    end
+
+      #kolla här om det har ett semicolon, om det har det så är det en icke statisk segment
+      #spara sedan ordningen av dom
+
+      #block är för saker som det den ska printa eller html filen, vad ska man göra om det inte finns en html fil?
+
+      #2026/04/17
 
 
   end
