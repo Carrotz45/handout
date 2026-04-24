@@ -51,6 +51,11 @@ class HTTPServer
 
       route_test = Route.new(request)
 
+      route_test.get("/hello/:id/test") do
+        p "hello"
+      end
+    
+
 
       html = nil
       

@@ -4,15 +4,19 @@ class Route
 
     @method, @resource = request.method, request.resource
 
-    @routes = {"/" => "index.html", "/pictures" => "pictures.html"} #method get
+    @routes = {
+      [{"part" => nil, "dynamic?" => false}] => "index.html",
+      [{"part" => "test", "dynamic?" => false}] => "test_static.html",
+      [{"part" => "pictures", "dynamic?" => false}, {"part" => ":id", "dynamic?" => true}] => "pictures.html"
+    } #method get
 
-    @image_file_types = ["jpg", "png"]
-    @audio_file_types = ["mp3", "ogg", "wav"]
+    # @image_file_types = ["jpg", "png"]
+    # @audio_file_types = ["mp3", "ogg", "wav"]
 
-    @file_types = {
-      "image" => @image_file_types, 
-      "audio" => @audio_file_types
-    }
+    # @file_types = {
+    #   "image" => @image_file_types, 
+    #   "audio" => @audio_file_types
+    # }
 
     @matched_route = matched_route
 
@@ -35,58 +39,70 @@ class Route
 
   end
 
-  def check_matching_route(resource)
+  def check_matching_route(incoming_resource)
 
-    #kolla om det finns i html
-    @routes.each do |key, value|
-      if key == resource
-        @content_type = "text/html"
-        p "html fil finns hos html/#{value}"
-        return "html/#{value}"
-      end
-    end
+    indexed_incoming_resource = index_resource(incoming_resource)
 
-    #kolla i public för en fil som matchar resource
-    if File.exist?("public#{resource}")
+    incoming_resource_amount_of_parts = indexed_incoming_resource.length
 
-      #kolla i file types each value sedan kolla om fil typen efter punkt är med i arrayen
+    matches = 0
 
-      path_file_type = (resource.split("."))[-1] #splitta vid . och behåll bara det sista värdet
+    @routes.keys.each do |route|
 
-      @file_types.each do |format, file_type|
-        if file_type.include?(path_file_type)
-          result = resource[1..-1]
-          @content_type = "#{format}/#{path_file_type}"
-          p "fil finns hos public/#{result}"
-          return "public/#{result}"
+      number_of_parts = route.length
+
+      if number_of_parts == incoming_resource_amount_of_parts
+
+        for i in 0..number_of_parts-1 do
+
+          route_key = route[i]
+          incoming_key = indexed_incoming_resource[i]
+
+          #jämför
         end
+          
+
+      else
+        "404"
       end
 
-      
 
-      
-    else
-      p "404"
-      return "html/404.html"
+
+      path_part = path["part"]
+      path_dynamic = path["dynamic?"] #jämför part till part om det är statiskt, om matchande räkna som matchning, om dynamiskt jämför inte part, men räkna som en matchning. 
+
+
+      indexed_incoming_resource.each do |segment|
+
+        if path_part == segment["part"] && path_dynamic == segment["dynamic?"] || path_dynamic = segment["dynamic?"]
+          matches +=1
+        end
+
+
+      end
+
+
     end
 
-    #ta bort kolla efter andra filer förutom html och att den kan sätta content type, flytta det till respons och kör om det inte hittas en html fil(if matched route true)
-    #börja med make new routes, post och dynamic routes som /pictures/:id
 
   end
 
-  def get(resource, &block)
-    path = resource.split("/")
-    path.each do |segment|
-      
-    end
+  def get(new_resource, &block)
 
-      #kolla här om det har ett semicolon, om det har det så är det en icke statisk segment
-      #spara sedan ordningen av dom
+    indexed_new_resource = index_resource(new_resource)
 
-      #block är för saker som det den ska printa eller html filen, vad ska man göra om det inte finns en html fil?
+    p block
 
-      #2026/04/17
+    p indexed_new_resource
+
+    #make new route med ny path
+
+    #kolla här om det har ett semicolon, om det har det så är det en icke statisk segment
+    #spara sedan ordningen av dom
+
+    #block är för saker som det den ska printa eller html filen, vad ska man göra om det inte finns en html fil?
+
+    #2026/04/17
 
 
   end
@@ -94,12 +110,27 @@ class Route
   def post(path)
   end
 
-  router.get("/hello/test") |id|
-    return "hello"
-  end
   def make_new_route(key, value)
-
   end
+
+  def index_resource(resource)
+
+    path = resource[1..-1].split("/")
+
+    sections = []
+
+    path.each do |segment|
+      if segment.include?(":")
+        sections << {"part" => segment, "dynamic?" => true}
+      else
+        sections << {"part" => segment, "dynamic?" => false}
+      end
+    end
+
+    return sections
+  end
+
 
 end
+
 
