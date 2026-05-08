@@ -53,6 +53,8 @@ class HTTPServer
 
       route_test.get("/hello/:id/test") do
         p "hello"
+
+        #file("hello")
       end
     
 
@@ -63,7 +65,7 @@ class HTTPServer
       matched_route = route_test.matched_route
 
   
-      html = File.binread(matched_route)
+      html = File.binread("html/#{matched_route}")
       #
 
 
@@ -81,7 +83,6 @@ class HTTPServer
 
       session.print "HTTP/1.1 200\r\n"
       session.print "Content-Type: #{content_type}\r\n"
-      p content_type
       session.print "\r\n"
       session.print html
       session.close

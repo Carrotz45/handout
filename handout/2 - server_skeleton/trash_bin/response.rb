@@ -1,7 +1,7 @@
 class Response
   attr_reader :content_type
-  def initialize(request)
-    @method, @resource, @params = request.method, request.resource, request.params
+  def initialize(route)
+    @route = route.matched_route
     
     @content_type = "text/html"
 
@@ -25,11 +25,7 @@ class Response
   
 
   def GET
-    @routes = [
-      ["/", "index.html"], 
-      ["/pictures", "pictures.html"]
-    ].to_h 
-
+    
     path = @resource
 
     
@@ -75,14 +71,5 @@ class Response
     end
 
 
-  end
-
-
-
-  def POST
-  end
-
-
-  def make_new_route
   end
 end

@@ -1,14 +1,16 @@
 class Route 
-  attr_reader :content_type, :matched_route
+  attr_reader :matched_route
   def initialize(request)
 
     @method, @resource = request.method, request.resource
 
     @routes = {
-      [{"part" => nil, "dynamic?" => false}] => "index.html",
+      [{"part" => "", "dynamic?" => false}] => "index.html",
       [{"part" => "test", "dynamic?" => false}] => "test_static.html",
       [{"part" => "pictures", "dynamic?" => false}, {"part" => ":id", "dynamic?" => true}] => "pictures.html"
-    } #method get
+    } 
+    
+    #method get
 
     # @image_file_types = ["jpg", "png"]
     # @audio_file_types = ["mp3", "ogg", "wav"]
@@ -30,8 +32,8 @@ class Route
       end
 
       @matched_route = check_matching_route(path)
-
     else
+
 
     end
 
@@ -45,9 +47,9 @@ class Route
 
     incoming_resource_amount_of_parts = indexed_incoming_resource.length
 
-    matches = 0
-
     @routes.keys.each do |route|
+
+      matches = 0
 
       number_of_parts = route.length
 
@@ -55,45 +57,48 @@ class Route
 
         for i in 0..number_of_parts-1 do
 
-          route_key = route[i]
-          incoming_key = indexed_incoming_resource[i]
-
-          #jämför
-        end
+          route_segment = route[i]
+          incoming_segment = indexed_incoming_resource[i]
           
+          if route_segment["dynamic?"] == false && incoming_segment["dynamic?"] == false
+            if route_segment["part"] == incoming_segment["part"]
+              p "static match"
+              matches += 1
+            end
 
-      else
-        "404"
-      end
+          elsif route_segment["dynamic?"] == true
+            p "dynamic match"
+            matches +=1
+          end
 
+          p"-------"
 
-
-      path_part = path["part"]
-      path_dynamic = path["dynamic?"] #jämför part till part om det är statiskt, om matchande räkna som matchning, om dynamiskt jämför inte part, men räkna som en matchning. 
-
-
-      indexed_incoming_resource.each do |segment|
-
-        if path_part == segment["part"] && path_dynamic == segment["dynamic?"] || path_dynamic = segment["dynamic?"]
-          matches +=1
         end
 
+        if matches == number_of_parts
+          matched_route = @routes[route]
+          return matched_route
+        end
 
       end
-
 
     end
 
+    return "404.html"
+
 
   end
+
+
+
 
   def get(new_resource, &block)
 
     indexed_new_resource = index_resource(new_resource)
 
-    p block
+    #p block
 
-    p indexed_new_resource
+    #p indexed_new_resource
 
     #make new route med ny path
 
@@ -104,6 +109,8 @@ class Route
 
     #2026/04/17
 
+    block.call
+
 
   end
 
@@ -111,14 +118,15 @@ class Route
   end
 
   def make_new_route(key, value)
+    @routes[key] = value
   end
 
+
+
+
   def index_resource(resource)
-
     path = resource[1..-1].split("/")
-
     sections = []
-
     path.each do |segment|
       if segment.include?(":")
         sections << {"part" => segment, "dynamic?" => true}
@@ -126,7 +134,6 @@ class Route
         sections << {"part" => segment, "dynamic?" => false}
       end
     end
-
     return sections
   end
 
