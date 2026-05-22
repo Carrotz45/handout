@@ -5,7 +5,8 @@ require_relative 'lib/route'
 
 class HTTPServer
 
-  def initialize(port)
+  def initialize(router, port)
+    @router = router
     @port = port
   end
 
@@ -41,6 +42,9 @@ class HTTPServer
       puts params if params
       puts '-' * 40
 
+
+
+      @router.get_request(request)
       
       
 
@@ -49,27 +53,21 @@ class HTTPServer
 
       #response som inte kan ta emot post eller params:
 
-      route_test = Route.new(request)
+      #route_test = Route.new()
 
-      route_test.get("/hello/:id/test") do
-        p "hello"
+      #route_test.get_request(request)
 
-        #file("hello")
-      end
+     # route_test.get("/hello/:id/test") do
+     #   p "hello"
+
+     #   file("hello")
+     # end
     
-
-
+      #route truthy
+      #false falsy
       html = nil
       
-      content_type = route_test.content_type
-      matched_route = route_test.matched_route
 
-  
-      html = File.binread("html/#{matched_route}")
-      #
-
-
-      #html = Response.new(request)
 
       # session.print "HTTP/1.1 200\r\n"
       # p html.content_type
@@ -82,7 +80,7 @@ class HTTPServer
 
 
       session.print "HTTP/1.1 200\r\n"
-      session.print "Content-Type: #{content_type}\r\n"
+      session.print "Content-Type: text\r\n"
       session.print "\r\n"
       session.print html
       session.close
@@ -90,5 +88,3 @@ class HTTPServer
   end
 end
 
-server = HTTPServer.new(4567)
-server.start
