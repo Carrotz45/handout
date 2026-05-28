@@ -27,7 +27,8 @@ class Request
 
   private #ta bort processen för att kolla på post params
   def process_request(string) #make this function more moduable and work if there is more than two headers. Also work let headers have more values (maybe make a two dim array for headers(?) so it kinda works like a table)
-    
+    #require 'debug'
+    #binding.break
     input = string.split("\n")
     method_resource_version = input[0].split() 
     possible_params = []

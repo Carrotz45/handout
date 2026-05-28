@@ -2,8 +2,10 @@ require 'socket'
 require_relative 'lib/request'
 require_relative 'lib/response'
 require_relative 'lib/route'
+require_relative 'app.rb'
 
 class HTTPServer
+  attr_reader :request
 
   def initialize(router, port)
     @router = router
@@ -23,17 +25,17 @@ class HTTPServer
         line = session.gets  # läs nästa rad
       end
 
-      request = Request.new(data)
+      @request = Request.new(data)
 
-      if request.method == "POST"
-        bytes = request.header["Content-Length"]
+      if @request.method == "POST"
+        bytes = @request.header["Content-Length"]
         p bytes
         params = session.read(bytes.to_i)
         p params
-        request.add_post_params(params)
+        @request.add_post_params(params)
       end
 
-      p request
+      p @request
 
 
       puts "RECEIVED REQUEST"
@@ -43,8 +45,11 @@ class HTTPServer
       puts '-' * 40
 
 
+      if @request
+        call_app()
+      end
 
-      @router.get_request(request)
+
       
       
 

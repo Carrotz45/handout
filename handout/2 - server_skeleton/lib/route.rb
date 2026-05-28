@@ -30,7 +30,11 @@ class Route
   end
 
   def check_matching_route(app_resource ,incoming_resource)
+    p app_resource
+    p incoming_resource
+
     app_resource_amount_of_parts = app_resource.length
+
     incoming_resource_amount_of_parts = incoming_resource.length
 
     if app_resource_amount_of_parts == incoming_resource_amount_of_parts
@@ -68,15 +72,23 @@ class Route
 
 
   def get(app_resource, &block)
+    p "get körs"
+
+
 
     indexed_app_resource = index_resource(app_resource)
 
     indexed_request_resource = index_resource(@request.resource)
 
+
+    #ge error 404 om 
+
     if check_matching_route(indexed_app_resource, indexed_request_resource) != false
       p @params
       block.call(@params)
     end
+
+
   end
 
   def post(path)
